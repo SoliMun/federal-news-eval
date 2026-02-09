@@ -183,5 +183,5 @@ Each line of the eval dataset (`--eval_path`) is a JSON object:
 | `rouge_score` | ROUGE-L metric computation |
 | `mlflow` | Experiment tracking and artifact logging |
 | `pandas` | Results aggregation |
-| 'jsonschema` | JSON schema validation |
-| 'tqdm` | Progress bar for eval loop |
+| `jsonschema` | JSON schema validation |
+| `tqdm` | Progress bar for eval loop |
