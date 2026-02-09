@@ -28,7 +28,7 @@ The evaluation pipeline follows these stages:
 - Load eval dataset (JSONL format)
 - Load model, tokenizer, and JSON schema
 
-**Stage 2: Prompt Construction:**
+**Stage 2: Prompt Construction**
 - Build system and user message for each article
 - Apply chat template formatting
 
