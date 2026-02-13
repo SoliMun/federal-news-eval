@@ -2,6 +2,13 @@
 
 *This code is an excerpt from a professional project, shared with approval from my employer. Certain details (internal paths, configuration values, and propriety tooling) have been removed or generalized to meet contractual requirements. The core logic, evaluation methodology, and decisions are intact.*
 
+---
+
+## Research Question
+Can an off-the-shelf (no fine-tuning) language model reliably generate structured, policy-relevant summaries of federal agency news that meet production quality requirements or does the complexity of the output format (strict JSON schema, bullet constraints, domain-restricted URLs) require some fine-tuning?
+
+This repository implements the evaluation framework used to answer that question. It measures model performance across seven structural dimensions and one content quality metric (ROUGE-L), establishing a quantitative baseline for the base model and a reproducible benchmark for comparing future fine-tuned checkpoints.
+
 ## Overview
 
 This package implements a systematic evaluation framework for a fine-tuned language model that generates summaries of federal agency news. The goal is to make sure model outputs meet both structural requirements and content quality standards before delivery to human reviewers. 
@@ -19,6 +26,14 @@ A fine-tuned LLM generates daily summaries of federal news articles. Each summar
 This framework provides a way to measure how well the model satisfies these requirements, enabling data-driven decisions when comparing model versions and tuning hyperparameters. 
 
 ---
+
+## Baseline Results
+
+**[`notebooks/baseline_analysis.ipynb`](notebooks/baseline_analysis.ipynb)** contains the full analysis of the base model's performance on a 315-article evaluation set. It walks through the research question, dataset context, pipeline-stage breakdown, gap analysis, and inference latency (with visualizations for each).
+
+**Summary finding:** The base model fails every production threshold, with the largest gaps in output length calibration (word count: −49pp, bullet count: −42pp). The failure pattern confirms that structured output compliance (not content understanding) is the primary bottleneck, and provides the quantitative motivation for fine-tuning.
+
+--
 
 ## How it Works
 
@@ -87,6 +102,10 @@ Orchestrates end-to-end pipeline:
 5. **Scoring:** Computes ROUGE-L F1 against reference summaries.
 6. **Logging:** Aggregates pass rates and latency percentiles across the eval set and logs parameters, metrics, and artifacts to MLflow.
 
+### `notebooks/baseline_analysis.ipynb` (Baseline Analysis)
+
+Exploratory analysis of the base model's performance on the 315-article eval set. Covers research framing, pipeline-stage breakdown, gap analysis, and inference latency. See [Baseline Results](#baseline-results) above.
+
 ---
 
 ## Evaluation Metrics
@@ -123,13 +142,13 @@ These thresholds define the minimum acceptable performance for a model to be con
 ## Key Design Decisions
 
 ### 1. Per Bullet Length vs. Average Length 
-Validation checks that every bullet meets the word count contstraint, not just the average. This prevents a scenario where one very long bullet and one very short bullet average to an acceptable value but produce an inconsistent reading experience.
+Validation checks that *every* bullet meets the word count contstraint, not just the average. This prevents a scenario where one very long bullet and one very short bullet average to an acceptable value but produce an inconsistent reading experience.
 
 ### 2. URL Fallback Strategy
 The model occasionally hallucinates or malforms source URLs. Rather than discarding an otherwise valid summary, the pipeline falls back to the original input URL when the generated URL fails the domain allowlist check. This perserves useful content while maintaining source reliability gaurantees. 
 
 ### 3. Bullet Format Coercion
-The model sometimes returns bullets as a JSON list rather than a newline separated string, or returns a paragraph without bullet markers. The pipeline normalizes these cases before applying validation. This design choice prioritizes measuring content quality over penalizing minor formatting variations. If the model writes good summaries but formats them as paragraphs, that is a different (and more fixable) problem than if it writes poor content. The validation metrics reflect post-normalization quality, focusing on whether the model can produce substansive, well-structured content once formatting issues are addressed.  
+The model sometimes returns bullets as a JSON list rather than a newline separated string, or returns a paragraph without bullet markers. The pipeline normalizes these cases before applying validation. This design choice prioritizes measuring content quality over penalizing minor formatting variations. If the model writes good summaries but formats them as paragraphs, that is a different (and more fixable) problem than if it writes poor content.
 
 ### 4. Context Budget Management
 Long articles can exceed the model's context window. The pipeline dynamically calculates a context budget based on `max_position_embeddings`, reserving 512 tokens of headroom for generation. This prevents silent truncation errors during inference without hardcoding a fixed input length.
