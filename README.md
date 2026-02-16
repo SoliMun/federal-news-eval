@@ -13,7 +13,7 @@ This repository implements the evaluation framework used to answer that question
 
 This package implements a systematic evaluation framework for a fine-tuned language model that generates summaries of federal agency news. The goal is to make sure model outputs meet both structural requirements and content quality standards before delivery to human reviewers. 
 
-The evaluation pipeline runs the model against a reference dataset, applies multi-dimensional quality checks defined in `bullet_rules.py`, computes automated metrics (includeing ROUGE-L), and logs all results to MLflow for reproducible cross-run comparison.
+The evaluation pipeline runs the model against a reference dataset, applies multi-dimensional quality checks defined in `bullet_rules.py`, computes automated metrics (including ROUGE-L), and logs all results to MLflow for reproducible cross-run comparison.
 
 ---
 
