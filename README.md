@@ -33,7 +33,7 @@ This framework provides a way to measure how well the model satisfies these requ
 
 **Summary finding:** The base model fails every production threshold, with the largest gaps in output length calibration (word count: −49pp, bullet count: −42pp). The failure pattern confirms that structured output compliance (not content understanding) is the primary bottleneck, and provides the quantitative motivation for fine-tuning.
 
---
+---
 
 ## How it Works
 
